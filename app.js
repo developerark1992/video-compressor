@@ -2,6 +2,11 @@ const { FFmpeg } = FFmpegWASM;
 const { fetchFile } = FFmpegUtil;
 
 const CORE_BASE_URL = new URL("vendor/core/", document.baseURI).href;
+const CORE_MT_BASE_URL = new URL("vendor/core-mt/", document.baseURI).href;
+// Multi-threaded core needs cross-origin isolation (COOP/COEP headers), which
+// only this site's own headers provide — falls back to single-thread when embedded
+// elsewhere without those headers, or when the browser lacks SharedArrayBuffer.
+const USE_MULTITHREAD = typeof self !== "undefined" && self.crossOriginIsolated === true;
 
 // CRF/qscale values per codec family: lower = higher quality/bigger file, higher = smaller/lower quality.
 // theora is inverted (higher qscale = better quality).
@@ -152,10 +157,18 @@ async function getFFmpeg() {
 
   ffmpegLoadPromise = (async () => {
     progressLabel.textContent = "Loading converter (first time only)…";
-    await ffmpeg.load({
-      coreURL: `${CORE_BASE_URL}ffmpeg-core.js`,
-      wasmURL: `${CORE_BASE_URL}ffmpeg-core.wasm`,
-    });
+    if (USE_MULTITHREAD) {
+      await ffmpeg.load({
+        coreURL: `${CORE_MT_BASE_URL}ffmpeg-core.js`,
+        wasmURL: `${CORE_MT_BASE_URL}ffmpeg-core.wasm`,
+        workerURL: `${CORE_MT_BASE_URL}ffmpeg-core.worker.js`,
+      });
+    } else {
+      await ffmpeg.load({
+        coreURL: `${CORE_BASE_URL}ffmpeg-core.js`,
+        wasmURL: `${CORE_BASE_URL}ffmpeg-core.wasm`,
+      });
+    }
     return ffmpeg;
   })();
 
