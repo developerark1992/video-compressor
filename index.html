@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Video Compressor & Converter</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>Video Compressor &amp; Converter</h1>
+      <p class="subtitle">Compress or convert your videos entirely in your browser. Nothing is uploaded anywhere.</p>
+    </header>
+
+    <main class="card">
+      <div id="dropzone" class="dropzone">
+        <input type="file" id="fileInput" accept="video/*,.mkv,.ts,.mts,.m2ts,.vob,.ogv,.rm,.rmvb,.divx,.asf,.dv,.mxf,.hevc,.h265,.yuv,.amv,.roq,.3gp,.3g2,.wmv,.flv,.f4v,.m4v,.mpg,.mpeg" hidden />
+        <div class="dropzone-content">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 16V4m0 0L7 9m5-5l5 5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p><strong>Click to choose a video</strong> or drag &amp; drop it here</p>
+          <p class="hint">MP4, MOV, MKV, AVI, WebM, FLV, WMV, 3GP, TS, and most other formats — any size</p>
+        </div>
+      </div>
+
+      <div id="fileInfo" class="file-info hidden">
+        <video id="preview" controls></video>
+        <div class="file-meta">
+          <div><span class="label">File:</span> <span id="fileName"></span></div>
+          <div><span class="label">Original size:</span> <span id="fileSize"></span></div>
+          <button id="changeFileBtn" class="link-btn">Choose a different file</button>
+        </div>
+      </div>
+
+      <div id="options" class="options hidden">
+        <div class="option-row">
+          <label for="formatSelect">Output format</label>
+          <select id="formatSelect">
+            <option value="mp4">MP4 (H.264) — best compatibility</option>
+            <option value="mp4-hevc">MP4 (HEVC/H.265) — smaller, modern devices</option>
+            <option value="webm">WebM (VP8) — smaller, modern browsers</option>
+            <option value="mov">MOV (H.264)</option>
+            <option value="mkv">MKV (H.264)</option>
+            <option value="avi">AVI (MPEG-4)</option>
+            <option value="flv">FLV (H.264)</option>
+            <option value="wmv">WMV (WMV2)</option>
+            <option value="m4v">M4V (H.264)</option>
+            <option value="3gp">3GP (MPEG-4)</option>
+            <option value="3g2">3G2 (MPEG-4)</option>
+            <option value="mpg">MPG (MPEG-2)</option>
+            <option value="ts">TS (H.264, MPEG transport stream)</option>
+            <option value="ogv">OGV (Theora)</option>
+            <option value="gif">GIF (animated)</option>
+            <option value="mp3">MP3 (audio only)</option>
+            <option value="wav">WAV (audio only, lossless)</option>
+          </select>
+        </div>
+
+        <div class="option-row" id="qualityRow">
+          <label for="qualitySelect">Quality vs. size</label>
+          <select id="qualitySelect">
+            <option value="high">High quality (larger file)</option>
+            <option value="balanced" selected>Balanced (recommended)</option>
+            <option value="small">Smaller file (more compression)</option>
+            <option value="tiny">Smallest file (max compression)</option>
+          </select>
+        </div>
+
+        <div class="option-row" id="resolutionRow">
+          <label for="resolutionSelect">Resolution</label>
+          <select id="resolutionSelect">
+            <option value="original">Keep original</option>
+            <option value="1080">1080p</option>
+            <option value="720">720p</option>
+            <option value="480">480p</option>
+          </select>
+        </div>
+
+        <button id="convertBtn" class="primary-btn">Convert</button>
+      </div>
+
+      <div id="progressSection" class="progress-section hidden">
+        <div class="progress-bar-track">
+          <div id="progressBar" class="progress-bar-fill"></div>
+        </div>
+        <p id="progressLabel">Loading converter…</p>
+      </div>
+
+      <div id="resultSection" class="result-section hidden">
+        <p id="resultSummary"></p>
+        <a id="downloadBtn" class="primary-btn" download>Download result</a>
+        <button id="startOverBtn" class="link-btn">Convert another file</button>
+      </div>
+
+      <p id="errorMsg" class="error hidden"></p>
+    </main>
+
+    <footer class="footer">
+      <p>Powered by <a href="https://ffmpegwasm.netlify.app/" target="_blank" rel="noopener">ffmpeg.wasm</a> — all processing happens locally on your device.</p>
+    </footer>
+  </div>
+
+  <script src="vendor/ffmpeg/ffmpeg.js"></script>
+  <script src="vendor/util/ffmpeg-util.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
