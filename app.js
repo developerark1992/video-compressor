@@ -42,6 +42,7 @@ const errorMsg = document.getElementById("errorMsg");
 let selectedFile = null;
 let ffmpeg = null;
 let ffmpegLoadPromise = null;
+let recentFfmpegLogs = [];
 
 function formatBytes(bytes) {
   if (bytes === 0) return "0 B";
@@ -143,6 +144,10 @@ async function getFFmpeg() {
     const pct = Math.min(100, Math.max(0, Math.round(progress * 100)));
     progressBar.style.width = `${pct}%`;
     progressLabel.textContent = `Converting… ${pct}%`;
+  });
+  ffmpeg.on("log", ({ message }) => {
+    recentFfmpegLogs.push(message);
+    if (recentFfmpegLogs.length > 20) recentFfmpegLogs.shift();
   });
 
   ffmpegLoadPromise = (async () => {
@@ -255,6 +260,7 @@ convertBtn.addEventListener("click", async () => {
 
     const args = buildFfmpegArgs(inputName, outputName, format, quality, resolution);
     progressLabel.textContent = "Converting… 0%";
+    recentFfmpegLogs = [];
     await instance.exec(args);
 
     const data = await instance.readFile(outputName);
@@ -305,8 +311,10 @@ convertBtn.addEventListener("click", async () => {
     resultSection.classList.remove("hidden");
   } catch (err) {
     console.error(err);
+    console.error("Recent ffmpeg output:", recentFfmpegLogs.join("\n"));
+    const detail = recentFfmpegLogs.slice(-3).join(" ") || (err && err.message) || "unknown error";
     showError(
-      "Something went wrong while converting this file. Very large files may run out of browser memory — try a shorter clip or lower resolution."
+      `Conversion failed: ${detail}. Very large files may run out of browser memory — try a shorter clip, a different output format, or a lower resolution.`
     );
     progressSection.classList.add("hidden");
   } finally {
