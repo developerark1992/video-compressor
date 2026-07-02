@@ -11,10 +11,10 @@ const USE_MULTITHREAD = typeof self !== "undefined" && self.crossOriginIsolated 
 // CRF/qscale values per codec family: lower = higher quality/bigger file, higher = smaller/lower quality.
 // theora is inverted (higher qscale = better quality).
 const QUALITY_PRESETS = {
-  high: { h264: 18, h265: 20, vp8: 10, mpeg4q: 4, theora: 9 },
-  balanced: { h264: 23, h265: 26, vp8: 20, mpeg4q: 8, theora: 6 },
-  small: { h264: 28, h265: 32, vp8: 32, mpeg4q: 14, theora: 4 },
-  tiny: { h264: 32, h265: 38, vp8: 44, mpeg4q: 20, theora: 2 },
+  high: { h264: 18, h265: 20, mpeg4q: 4, theora: 9 },
+  balanced: { h264: 23, h265: 26, mpeg4q: 8, theora: 6 },
+  small: { h264: 28, h265: 32, mpeg4q: 14, theora: 4 },
+  tiny: { h264: 32, h265: 38, mpeg4q: 20, theora: 2 },
 };
 
 // Formats whose output file extension differs from their formatSelect value.
@@ -196,11 +196,6 @@ function buildFfmpegArgs(inputName, outputName, format, quality, resolution) {
       args.push(...scaleFilter, "-c:v", "libx265", "-crf", String(crf), "-preset", "medium", "-tag:v", "hvc1", "-c:a", "aac", "-b:a", "128k");
       break;
     }
-    case "webm": {
-      const crf = QUALITY_PRESETS[quality].vp8;
-      args.push(...scaleFilter, "-c:v", "libvpx", "-crf", String(crf), "-b:v", "1M", "-c:a", "libopus");
-      break;
-    }
     case "avi": {
       const q = QUALITY_PRESETS[quality].mpeg4q;
       args.push(...scaleFilter, "-c:v", "mpeg4", "-qscale:v", String(q), "-c:a", "libmp3lame");
@@ -280,7 +275,6 @@ convertBtn.addEventListener("click", async () => {
     const mimeMap = {
       mp4: "video/mp4",
       "mp4-hevc": "video/mp4",
-      webm: "video/webm",
       mov: "video/quicktime",
       mkv: "video/x-matroska",
       avi: "video/x-msvideo",
